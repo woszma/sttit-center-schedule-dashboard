@@ -302,11 +302,14 @@
       font-size: clamp(1.1rem, 1.2vw, 1.35rem);
     }
 
+    .heading-row {
+      display: flex;
+      align-items: center;
+      gap: 0.7vw;
+    }
+
     .control-dock {
-      position: absolute;
-      top: 2.2vh;
-      right: 2.2vw;
-      width: min(24rem, 24vw);
+      position: relative;
       z-index: 20;
     }
 
@@ -320,10 +323,13 @@
     .control-dock summary {
       list-style: none;
       cursor: pointer;
-      padding: 0.9vh 1vw;
+      display: grid;
+      place-items: center;
+      width: 2.5rem;
+      height: 2.5rem;
       color: var(--muted);
-      font-size: clamp(0.9rem, 0.9vw, 1rem);
-      text-align: right;
+      font-size: 1.25rem;
+      line-height: 1;
     }
 
     .control-dock summary::-webkit-details-marker {
@@ -331,9 +337,17 @@
     }
 
     .control-inner {
-      padding: 0 1vw 1vw;
+      position: absolute;
+      top: calc(100% + 0.8vh);
+      right: 0;
+      width: min(24rem, 24vw);
+      padding: 1vw;
       display: grid;
       gap: 0.9vh;
+      border-radius: 1.2vw;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(18, 32, 43, 0.08);
+      box-shadow: 0 20px 50px rgba(18, 32, 43, 0.16);
     }
 
     .calendar-status {
@@ -417,12 +431,6 @@
         min-height: auto;
       }
 
-      .control-dock {
-        position: static;
-        width: 100%;
-        margin-bottom: 16px;
-      }
-
       .schedule-topbar,
       .event-card {
         grid-template-columns: 1fr;
@@ -430,6 +438,13 @@
 
       .schedule-actions {
         justify-content: flex-start;
+      }
+
+      .control-inner {
+        position: static;
+        width: 100%;
+        margin-top: 8px;
+        padding: 14px;
       }
 
       .event-location {
@@ -440,42 +455,6 @@
 </head>
 <body>
   <div class="tv-shell">
-    <aside class="control-dock">
-      <details>
-        <summary>Calendar 設定</summary>
-        <div class="control-inner">
-          <div class="calendar-status" id="calendar-status">等待 Google Calendar 設定。</div>
-
-          <form class="settings" id="config-form">
-            <label>
-              自選日子
-              <input id="selected-date" type="date">
-            </label>
-            <label>
-              Google API Key
-              <input id="api-key" name="api-key" type="text" placeholder="輸入 Google API Key" autocomplete="off">
-            </label>
-            <label>
-              Calendar ID
-              <input id="calendar-id" name="calendar-id" type="text" placeholder="例如 example@gmail.com 或群組 calendar id" autocomplete="off">
-            </label>
-            <button type="submit">更新日曆來源</button>
-            <p class="tiny">
-              此頁面使用 Google Calendar JSON API。私人事件通常只會回傳時間，不會回傳標題與地點。
-            </p>
-            <p class="tiny">
-              狀態標記建議：取消可直接在 Google Calendar 取消事件，或在標題/描述加入 `#已取消`；改期可在標題或描述加入 `#已改期`。
-            </p>
-          </form>
-
-          <details class="debug-panel">
-            <summary>除錯資訊</summary>
-            <pre class="debug-output" id="debug-output">尚未載入事件。</pre>
-          </details>
-        </div>
-      </details>
-    </aside>
-
     <main class="dashboard">
       <section class="panel hero">
         <div>
@@ -493,7 +472,44 @@
       <section class="panel schedule">
         <div class="schedule-topbar">
           <div class="schedule-heading">
-            <h2 id="schedule-title">今日課表</h2>
+            <div class="heading-row">
+              <h2 id="schedule-title">今日課表</h2>
+              <aside class="control-dock">
+                <details>
+                  <summary aria-label="Calendar 設定">&#9881;</summary>
+                  <div class="control-inner">
+                    <div class="calendar-status" id="calendar-status">等待 Google Calendar 設定。</div>
+
+                    <form class="settings" id="config-form">
+                      <label>
+                        自選日子
+                        <input id="selected-date" type="date">
+                      </label>
+                      <label>
+                        Google API Key
+                        <input id="api-key" name="api-key" type="text" placeholder="輸入 Google API Key" autocomplete="off">
+                      </label>
+                      <label>
+                        Calendar ID
+                        <input id="calendar-id" name="calendar-id" type="text" placeholder="例如 example@gmail.com 或群組 calendar id" autocomplete="off">
+                      </label>
+                      <button type="submit">更新日曆來源</button>
+                      <p class="tiny">
+                        此頁面使用 Google Calendar JSON API。私人事件通常只會回傳時間，不會回傳標題與地點。
+                      </p>
+                      <p class="tiny">
+                        狀態標記建議：取消可直接在 Google Calendar 取消事件，或在標題/描述加入 `#已取消`；改期可在標題或描述加入 `#已改期`。
+                      </p>
+                    </form>
+
+                    <details class="debug-panel">
+                      <summary>除錯資訊</summary>
+                      <pre class="debug-output" id="debug-output">尚未載入事件。</pre>
+                    </details>
+                  </div>
+                </details>
+              </aside>
+            </div>
             <p id="schedule-subtitle">顯示所選日期的課堂安排、時間與地點。</p>
           </div>
 
@@ -648,12 +664,50 @@
       return "未命名事件";
     }
 
+    function getStatusMatches(event) {
+      const sourceText = `${event.summary || ""}\n${event.description || ""}`;
+      const patterns = [
+        /#(已取消[^\n\r#\[]*)/i,
+        /\[(已取消[^\]\n\r]*)\]/i,
+        /(已取消[^\n\r]*)/i,
+        /#(已改期[^\n\r#\[]*)/i,
+        /\[(已改期[^\]\n\r]*)\]/i,
+        /(已改期[^\n\r]*)/i,
+        /#(cancelled[^\n\r#\[]*)/i,
+        /\[(cancelled[^\]\n\r]*)\]/i,
+        /(cancelled[^\n\r]*)/i,
+        /#(rescheduled[^\n\r#\[]*)/i,
+        /\[(rescheduled[^\]\n\r]*)\]/i,
+        /(rescheduled[^\n\r]*)/i
+      ];
+
+      return patterns
+        .map((pattern) => {
+          const match = sourceText.match(pattern);
+          return match ? match[1] || match[0] : "";
+        })
+        .filter(Boolean);
+    }
+
     function getEventNote(event) {
       if (event.visibility === "private" && !event.summary) {
         return "此事件被設為私人，Google 不會公開標題與詳細內容。";
       }
 
-      return event.description || "";
+      const statusMatches = getStatusMatches(event);
+      let description = event.description || "";
+
+      statusMatches.forEach((statusText) => {
+        const escaped = statusText.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        description = description
+          .replace(new RegExp(`#${escaped}`, "gi"), "")
+          .replace(new RegExp(`\\[${escaped}\\]`, "gi"), "")
+          .replace(new RegExp(escaped, "gi"), "");
+      });
+
+      description = description.trim();
+
+      return description;
     }
 
     function getStatusSourceText(event) {
@@ -686,6 +740,24 @@
       }
 
       return "normal";
+    }
+
+    function getEventStatusLabel(event, eventState) {
+      const matches = getStatusMatches(event);
+
+      if (matches.length) {
+        return matches[0].replace(/^#/, "").trim();
+      }
+
+      if (eventState === "cancelled") {
+        return "已取消";
+      }
+
+      if (eventState === "rescheduled") {
+        return "已改期";
+      }
+
+      return "";
     }
 
     function updateDebugOutput(payload) {
@@ -732,14 +804,14 @@
         if (eventState === "cancelled") {
           const cancelledFlag = document.createElement("span");
           cancelledFlag.className = "event-flag is-cancelled";
-          cancelledFlag.textContent = "已取消";
+          cancelledFlag.textContent = getEventStatusLabel(event, eventState);
           flags.appendChild(cancelledFlag);
         }
 
         if (eventState === "rescheduled") {
           const rescheduledFlag = document.createElement("span");
           rescheduledFlag.className = "event-flag is-rescheduled";
-          rescheduledFlag.textContent = "已改期";
+          rescheduledFlag.textContent = getEventStatusLabel(event, eventState);
           flags.appendChild(rescheduledFlag);
         }
 

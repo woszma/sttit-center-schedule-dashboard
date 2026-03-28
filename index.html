@@ -6,140 +6,182 @@
   <title>STTIT - 中心課表dashboard</title>
   <style>
     :root {
-      --bg-1: #f6f1e8;
-      --bg-2: #dce6f2;
-      --panel: rgba(255, 252, 247, 0.78);
-      --border: rgba(28, 44, 58, 0.14);
-      --text: #14212b;
-      --muted: #5f6f7c;
-      --accent: #c45c2f;
-      --shadow: 0 20px 50px rgba(20, 33, 43, 0.12);
+      --bg-top: #efe4d2;
+      --bg-bottom: #cfdced;
+      --panel: rgba(255, 250, 243, 0.74);
+      --panel-strong: rgba(255, 255, 255, 0.84);
+      --border: rgba(22, 34, 44, 0.12);
+      --text: #12202b;
+      --muted: #5e6e7d;
+      --accent: #cb6330;
+      --accent-soft: rgba(203, 99, 48, 0.14);
+      --shadow: 0 28px 70px rgba(18, 32, 43, 0.14);
     }
 
     * {
       box-sizing: border-box;
     }
 
+    html,
     body {
       margin: 0;
-      min-height: 100vh;
+      min-height: 100%;
+    }
+
+    body {
       font-family: "Avenir Next", "PingFang TC", "Noto Sans TC", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at top left, rgba(255, 255, 255, 0.9), transparent 28%),
-        linear-gradient(135deg, var(--bg-1), var(--bg-2));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.88), transparent 22%),
+        radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.46), transparent 26%),
+        linear-gradient(160deg, var(--bg-top), var(--bg-bottom));
+      overflow: hidden;
+    }
+
+    .tv-shell {
+      position: relative;
+      width: 100vw;
+      min-height: 100vh;
+      padding: 2.2vh 2.2vw;
     }
 
     .dashboard {
-      width: min(1120px, 100%);
       display: grid;
-      grid-template-columns: 1.08fr 1fr;
-      gap: 24px;
+      grid-template-columns: 33vw 1fr;
+      gap: 1.4vw;
+      min-height: calc(100vh - 4.4vh);
     }
 
     .panel {
       background: var(--panel);
       border: 1px solid var(--border);
-      border-radius: 28px;
-      backdrop-filter: blur(18px);
+      border-radius: 2vw;
       box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
     }
 
     .hero {
-      padding: 40px;
+      padding: 3.2vh 2.2vw;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 640px;
+      min-height: 0;
     }
 
     .eyebrow {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
+      gap: 0.5vw;
+      width: fit-content;
+      padding: 0.6vh 0.9vw;
       border-radius: 999px;
-      background: rgba(20, 33, 43, 0.06);
+      background: rgba(18, 32, 43, 0.06);
       color: var(--muted);
-      font-size: 0.9rem;
-      letter-spacing: 0.04em;
+      font-size: clamp(0.85rem, 0.95vw, 1rem);
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
     .date-block h1 {
-      margin: 20px 0 8px;
-      font-size: clamp(2.8rem, 7vw, 5rem);
-      line-height: 0.98;
-      letter-spacing: -0.05em;
+      margin: 2.2vh 0 0.8vh;
+      font-size: clamp(3.3rem, 5vw, 5.8rem);
+      line-height: 0.94;
+      letter-spacing: -0.06em;
     }
 
     .date-block p {
       margin: 0;
-      font-size: 1.2rem;
+      font-size: clamp(1.15rem, 1.35vw, 1.55rem);
       color: var(--muted);
     }
 
     .clock {
-      margin-top: 18px;
-      font-size: clamp(3.1rem, 8vw, 5.8rem);
+      margin-top: 1.6vh;
+      font-size: clamp(4rem, 6.3vw, 7rem);
       font-weight: 700;
       letter-spacing: -0.06em;
+      line-height: 0.92;
+      font-variant-numeric: tabular-nums;
     }
 
     .project-name {
-      margin-top: 22px;
-      font-size: 1rem;
+      font-size: clamp(1rem, 1vw, 1.15rem);
       color: var(--muted);
-    }
-
-    .status-card {
-      margin-top: 24px;
-      padding: 18px 20px;
-      border-radius: 22px;
-      background: rgba(255, 255, 255, 0.52);
-      border: 1px solid rgba(20, 33, 43, 0.08);
-    }
-
-    .status-card strong {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 0.95rem;
-      text-transform: uppercase;
-      color: var(--muted);
-      letter-spacing: 0.06em;
     }
 
     .schedule {
-      padding: 28px;
-      min-height: 640px;
-      display: flex;
-      flex-direction: column;
+      padding: 2.8vh 2vw;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 1.8vh;
     }
 
-    .schedule-header {
+    .schedule-topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1.4vw;
+    }
+
+    .schedule-heading h2 {
+      margin: 0;
+      font-size: clamp(2rem, 2.5vw, 3rem);
+      letter-spacing: -0.04em;
+    }
+
+    .schedule-heading p {
+      margin: 0.4vh 0 0;
+      color: var(--muted);
+      font-size: clamp(1rem, 1.1vw, 1.2rem);
+    }
+
+    .schedule-actions {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 20px;
+      gap: 0.8vw;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
-    .schedule-header h2 {
-      margin: 0;
-      font-size: 1.5rem;
+    .date-picker {
+      display: flex;
+      align-items: center;
+      gap: 0.7vw;
+      padding: 0.8vh 0.8vw;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(18, 32, 43, 0.08);
     }
 
+    .date-picker label {
+      font-size: clamp(0.95rem, 0.95vw, 1rem);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .date-picker input {
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      min-width: 10.5rem;
+    }
+
+    .ghost-button,
     .refresh-button,
     .settings button {
       border: 0;
-      border-radius: 14px;
-      padding: 12px 16px;
+      border-radius: 999px;
+      padding: 0.95vh 1.15vw;
+      font: inherit;
       font-weight: 600;
       cursor: pointer;
+    }
+
+    .ghost-button {
+      background: rgba(18, 32, 43, 0.08);
+      color: var(--text);
     }
 
     .refresh-button {
@@ -147,69 +189,137 @@
       color: white;
     }
 
+    .schedule-board {
+      min-height: 0;
+      overflow: auto;
+      padding-right: 0.2vw;
+    }
+
     .calendar-list {
       display: grid;
-      gap: 14px;
-      margin-top: 8px;
+      gap: 1.2vh;
     }
 
     .event-card {
-      padding: 18px;
-      border-radius: 20px;
-      border: 1px solid rgba(20, 33, 43, 0.08);
-      background: white;
       display: grid;
-      gap: 8px;
+      grid-template-columns: minmax(11rem, 16rem) 1fr minmax(9rem, 12rem);
+      gap: 1vw;
+      align-items: center;
+      padding: 1.5vh 1.3vw;
+      border-radius: 1.5vw;
+      border: 1px solid rgba(18, 32, 43, 0.08);
+      background: rgba(255, 255, 255, 0.92);
     }
 
     .event-time {
-      font-size: 0.95rem;
+      font-size: clamp(1rem, 1.12vw, 1.2rem);
       color: var(--accent);
       font-weight: 700;
-      letter-spacing: 0.03em;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .event-main {
+      min-width: 0;
     }
 
     .event-title {
       margin: 0;
-      font-size: 1.2rem;
+      font-size: clamp(1.2rem, 1.5vw, 1.8rem);
+      line-height: 1.2;
+      word-break: break-word;
+    }
+
+    .event-note {
+      margin-top: 0.5vh;
+      color: var(--muted);
+      font-size: clamp(0.95rem, 1vw, 1.1rem);
     }
 
     .event-location {
-      color: var(--muted);
+      justify-self: end;
+      padding: 0.8vh 0.9vw;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--text);
+      font-size: clamp(0.92rem, 0.98vw, 1.05rem);
+      text-align: center;
+      max-width: 100%;
+      word-break: break-word;
     }
 
     .empty-state,
     .error-state {
-      flex: 1;
+      min-height: 100%;
       display: grid;
       place-items: center;
       text-align: center;
       color: var(--muted);
-      padding: 24px;
-      border: 1px dashed rgba(20, 33, 43, 0.18);
-      border-radius: 24px;
+      padding: 2.4vh 2vw;
+      border: 1px dashed rgba(18, 32, 43, 0.18);
+      border-radius: 1.7vw;
       background: rgba(255, 255, 255, 0.35);
+      font-size: clamp(1.1rem, 1.2vw, 1.35rem);
+    }
+
+    .control-dock {
+      position: absolute;
+      top: 2.2vh;
+      right: 2.2vw;
+      width: min(24rem, 24vw);
+      z-index: 20;
+    }
+
+    .control-dock details {
+      border-radius: 1.2vw;
+      background: rgba(255, 255, 255, 0.34);
+      border: 1px solid rgba(18, 32, 43, 0.08);
+      backdrop-filter: blur(12px);
+    }
+
+    .control-dock summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 0.9vh 1vw;
+      color: var(--muted);
+      font-size: clamp(0.9rem, 0.9vw, 1rem);
+      text-align: right;
+    }
+
+    .control-dock summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .control-inner {
+      padding: 0 1vw 1vw;
+      display: grid;
+      gap: 0.9vh;
+    }
+
+    .calendar-status {
+      font-size: clamp(0.88rem, 0.9vw, 0.98rem);
+      color: var(--muted);
+      line-height: 1.5;
     }
 
     .settings {
-      margin-top: 20px;
       display: grid;
-      gap: 12px;
+      gap: 0.8vh;
     }
 
     .settings label {
       display: grid;
-      gap: 6px;
-      font-size: 0.92rem;
+      gap: 0.45vh;
+      font-size: clamp(0.9rem, 0.9vw, 0.98rem);
       color: var(--muted);
     }
 
     .settings input {
       width: 100%;
-      border: 1px solid rgba(20, 33, 43, 0.14);
-      border-radius: 14px;
-      padding: 12px 14px;
+      border: 1px solid rgba(18, 32, 43, 0.14);
+      border-radius: 0.9vw;
+      padding: 0.9vh 0.85vw;
       font: inherit;
       color: var(--text);
       background: rgba(255, 255, 255, 0.88);
@@ -222,70 +332,150 @@
     }
 
     .tiny {
-      font-size: 0.86rem;
+      font-size: clamp(0.82rem, 0.82vw, 0.9rem);
       color: var(--muted);
       margin: 0;
       line-height: 1.5;
     }
 
-    @media (max-width: 900px) {
+    .debug-panel {
+      border-radius: 1vw;
+      background: rgba(18, 32, 43, 0.04);
+      border: 1px solid rgba(18, 32, 43, 0.08);
+    }
+
+    .debug-panel summary {
+      cursor: pointer;
+      padding: 0.8vh 0.8vw;
+      font-weight: 600;
+      color: var(--text);
+      text-align: left;
+    }
+
+    .debug-output {
+      margin: 0;
+      padding: 0 0.8vw 0.8vw;
+      max-height: 16vh;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: clamp(0.76rem, 0.75vw, 0.84rem);
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    @media (max-width: 1100px) {
+      body {
+        overflow: auto;
+      }
+
+      .tv-shell {
+        padding: 18px;
+      }
+
       .dashboard {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .control-dock {
+        position: static;
+        width: 100%;
+        margin-bottom: 16px;
+      }
+
+      .schedule-topbar,
+      .event-card {
         grid-template-columns: 1fr;
       }
 
-      .hero,
-      .schedule {
-        min-height: auto;
+      .schedule-actions {
+        justify-content: flex-start;
+      }
+
+      .event-location {
+        justify-self: start;
       }
     }
   </style>
 </head>
 <body>
-  <main class="dashboard">
-    <section class="panel hero">
-      <div>
-        <span class="eyebrow">Today Overview</span>
-        <div class="date-block">
-          <h1 id="today-date">載入中...</h1>
-          <p id="today-weekday">請稍候</p>
-          <div class="clock" id="clock">--:--:--</div>
+  <div class="tv-shell">
+    <aside class="control-dock">
+      <details>
+        <summary>Calendar 設定</summary>
+        <div class="control-inner">
+          <div class="calendar-status" id="calendar-status">等待 Google Calendar 設定。</div>
+
+          <form class="settings" id="config-form">
+            <label>
+              自選日子
+              <input id="selected-date" type="date">
+            </label>
+            <label>
+              Google API Key
+              <input id="api-key" name="api-key" type="text" placeholder="輸入 Google API Key" autocomplete="off">
+            </label>
+            <label>
+              Calendar ID
+              <input id="calendar-id" name="calendar-id" type="text" placeholder="例如 example@gmail.com 或群組 calendar id" autocomplete="off">
+            </label>
+            <button type="submit">更新日曆來源</button>
+            <p class="tiny">
+              此頁面使用 Google Calendar JSON API。私人事件通常只會回傳時間，不會回傳標題與地點。
+            </p>
+          </form>
+
+          <details class="debug-panel">
+            <summary>除錯資訊</summary>
+            <pre class="debug-output" id="debug-output">尚未載入事件。</pre>
+          </details>
         </div>
+      </details>
+    </aside>
+
+    <main class="dashboard">
+      <section class="panel hero">
+        <div>
+          <span class="eyebrow">Center Schedule</span>
+          <div class="date-block">
+            <h1 id="today-date">載入中...</h1>
+            <p id="today-weekday">請稍候</p>
+            <div class="clock" id="clock">--:--:--</div>
+          </div>
+        </div>
+
         <div class="project-name">STTIT - 中心課表dashboard</div>
-      </div>
+      </section>
 
-      <div class="status-card">
-        <strong>Calendar Source</strong>
-        <div id="calendar-status">等待 Google Calendar 設定。</div>
+      <section class="panel schedule">
+        <div class="schedule-topbar">
+          <div class="schedule-heading">
+            <h2 id="schedule-title">今日課表</h2>
+            <p id="schedule-subtitle">顯示所選日期的課堂安排、時間與地點。</p>
+          </div>
 
-        <form class="settings" id="config-form">
-          <label>
-            Google API Key
-            <input id="api-key" name="api-key" type="text" placeholder="輸入 Google API Key" autocomplete="off">
-          </label>
-          <label>
-            Calendar ID
-            <input id="calendar-id" name="calendar-id" type="text" placeholder="例如 example@gmail.com 或群組 calendar id" autocomplete="off">
-          </label>
-          <button type="submit">儲存並載入今日行程</button>
-          <p class="tiny">
-            此頁面使用 Google Calendar JSON API。你的日曆需要設為公開，或在 Google Cloud 端允許此 API 請求。
-          </p>
-        </form>
-      </div>
-    </section>
+          <div class="schedule-actions">
+            <button class="ghost-button" id="today-button" type="button">返回今天</button>
+            <button class="refresh-button" id="refresh-button" type="button">重新整理</button>
+          </div>
+        </div>
 
-    <section class="panel schedule">
-      <div class="schedule-header">
-        <h2>今日課表</h2>
-        <button class="refresh-button" id="refresh-button" type="button">重新整理</button>
-      </div>
-      <div id="schedule-content" class="empty-state">
-        請先填入 Google API Key 與 Calendar ID 來載入今天的行程。
-      </div>
-    </section>
-  </main>
+        <div class="schedule-board">
+          <div id="schedule-content" class="empty-state">
+            正在準備課表畫面。
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <script>
+    const defaultConfig = {
+      apiKey: "AIzaSyC7xa7xqApdg-9cMoTeXDzNmCd-an8Rc6M",
+      calendarId: "083ec7d7bd60163ad48c541f1489d74d794f914782549f378b55780c19d28719@group.calendar.google.com"
+    };
+
     const storageKeys = {
       apiKey: "sttit-google-api-key",
       calendarId: "sttit-google-calendar-id"
@@ -294,23 +484,75 @@
     const todayDateEl = document.getElementById("today-date");
     const todayWeekdayEl = document.getElementById("today-weekday");
     const clockEl = document.getElementById("clock");
+    const scheduleTitleEl = document.getElementById("schedule-title");
+    const scheduleSubtitleEl = document.getElementById("schedule-subtitle");
     const scheduleContentEl = document.getElementById("schedule-content");
     const calendarStatusEl = document.getElementById("calendar-status");
     const configForm = document.getElementById("config-form");
     const refreshButton = document.getElementById("refresh-button");
+    const todayButton = document.getElementById("today-button");
+    const dateInput = document.getElementById("selected-date");
     const apiKeyInput = document.getElementById("api-key");
     const calendarIdInput = document.getElementById("calendar-id");
+    const debugOutputEl = document.getElementById("debug-output");
+
+    function getConfig() {
+      return {
+        apiKey: localStorage.getItem(storageKeys.apiKey) || defaultConfig.apiKey,
+        calendarId: localStorage.getItem(storageKeys.calendarId) || defaultConfig.calendarId
+      };
+    }
+
+    function getTodayInputValue() {
+      const now = new Date();
+      const offset = now.getTimezoneOffset();
+      const local = new Date(now.getTime() - offset * 60000);
+      return local.toISOString().slice(0, 10);
+    }
+
+    function getSelectedDateValue() {
+      return dateInput.value || getTodayInputValue();
+    }
+
+    function parseLocalDate(dateValue) {
+      const [year, month, day] = dateValue.split("-").map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    function formatDisplayDate(dateValue) {
+      const date = parseLocalDate(dateValue);
+      return {
+        monthDay: date.toLocaleDateString("zh-TW", {
+          month: "long",
+          day: "numeric"
+        }),
+        full: date.toLocaleDateString("zh-TW", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          weekday: "long"
+        })
+      };
+    }
+
+    function isToday(dateValue) {
+      return dateValue === getTodayInputValue();
+    }
+
+    function updateHeaderDate() {
+      const selectedDate = getSelectedDateValue();
+      const formatted = formatDisplayDate(selectedDate);
+
+      todayDateEl.textContent = formatted.monthDay;
+      todayWeekdayEl.textContent = formatted.full;
+      scheduleTitleEl.textContent = isToday(selectedDate) ? "今日課表" : `${formatted.monthDay} 課表`;
+      scheduleSubtitleEl.textContent = isToday(selectedDate)
+        ? "顯示今天的課堂安排、時間與地點。"
+        : `顯示 ${formatted.full} 的課堂安排、時間與地點。`;
+    }
 
     function updateClock() {
       const now = new Date();
-      todayDateEl.textContent = now.toLocaleDateString("zh-TW", {
-        month: "long",
-        day: "numeric"
-      });
-      todayWeekdayEl.textContent = now.toLocaleDateString("zh-TW", {
-        weekday: "long",
-        year: "numeric"
-      });
       clockEl.textContent = now.toLocaleTimeString("zh-TW", {
         hour: "2-digit",
         minute: "2-digit",
@@ -319,12 +561,12 @@
       });
     }
 
-    function getDayWindow() {
-      const now = new Date();
-      const start = new Date(now);
+    function getDayWindow(dateValue) {
+      const selected = parseLocalDate(dateValue);
+      const start = new Date(selected);
       start.setHours(0, 0, 0, 0);
 
-      const end = new Date(now);
+      const end = new Date(selected);
       end.setHours(23, 59, 59, 999);
 
       return {
@@ -352,10 +594,34 @@
       })}`;
     }
 
+    function getEventTitle(event) {
+      if (event.summary) {
+        return event.summary;
+      }
+
+      if (event.visibility === "private") {
+        return "私人事件";
+      }
+
+      return "未命名事件";
+    }
+
+    function getEventNote(event) {
+      if (event.visibility === "private" && !event.summary) {
+        return "此事件被設為私人，Google 不會公開標題與詳細內容。";
+      }
+
+      return event.description || "";
+    }
+
+    function updateDebugOutput(payload) {
+      debugOutputEl.textContent = JSON.stringify(payload, null, 2);
+    }
+
     function renderEvents(events) {
       if (!events.length) {
         scheduleContentEl.className = "empty-state";
-        scheduleContentEl.textContent = "今天沒有安排事件。";
+        scheduleContentEl.textContent = "所選日期沒有安排事件。";
         return;
       }
 
@@ -370,15 +636,27 @@
         time.className = "event-time";
         time.textContent = formatEventTime(event);
 
+        const main = document.createElement("div");
+        main.className = "event-main";
+
         const title = document.createElement("h3");
         title.className = "event-title";
-        title.textContent = event.summary || "未命名事件";
+        title.textContent = getEventTitle(event);
+
+        const note = document.createElement("div");
+        note.className = "event-note";
+        note.textContent = getEventNote(event);
+
+        main.appendChild(title);
+        if (note.textContent) {
+          main.appendChild(note);
+        }
 
         const location = document.createElement("div");
         location.className = "event-location";
         location.textContent = event.location || "未提供地點";
 
-        card.append(time, title, location);
+        card.append(time, main, location);
         list.appendChild(card);
       });
 
@@ -393,23 +671,28 @@
     }
 
     async function loadEvents() {
-      const apiKey = localStorage.getItem(storageKeys.apiKey) || "";
-      const calendarId = localStorage.getItem(storageKeys.calendarId) || "";
+      const selectedDate = getSelectedDateValue();
+      const { apiKey, calendarId } = getConfig();
 
       apiKeyInput.value = apiKey;
       calendarIdInput.value = calendarId;
+      updateHeaderDate();
 
       if (!apiKey || !calendarId) {
         calendarStatusEl.textContent = "尚未完成 Google Calendar 設定。";
+        updateDebugOutput({
+          configured: false,
+          reason: "missing_api_key_or_calendar_id"
+        });
         renderError("請先輸入 Google API Key 與 Calendar ID。");
         return;
       }
 
-      calendarStatusEl.textContent = `正在從 ${calendarId} 載入事件`;
+      calendarStatusEl.textContent = `正在從 ${calendarId} 載入 ${selectedDate} 的事件。`;
       scheduleContentEl.className = "empty-state";
-      scheduleContentEl.textContent = "正在載入今天的行程...";
+      scheduleContentEl.textContent = "正在載入所選日期的課表...";
 
-      const { timeMin, timeMax } = getDayWindow();
+      const { timeMin, timeMax } = getDayWindow(selectedDate);
       const url = new URL(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`);
       url.searchParams.set("key", apiKey);
       url.searchParams.set("singleEvents", "true");
@@ -424,9 +707,32 @@
         }
 
         const data = await response.json();
+        updateDebugOutput({
+          configured: true,
+          calendarId,
+          selectedDate,
+          itemCount: (data.items || []).length,
+          items: (data.items || []).map((event) => ({
+            id: event.id,
+            status: event.status,
+            summary: event.summary,
+            description: event.description,
+            location: event.location,
+            start: event.start,
+            end: event.end,
+            visibility: event.visibility,
+            htmlLink: event.htmlLink
+          }))
+        });
         renderEvents(data.items || []);
-        calendarStatusEl.textContent = `今天共載入 ${(data.items || []).length} 筆事件。`;
+        calendarStatusEl.textContent = `${selectedDate} 共載入 ${(data.items || []).length} 筆事件。`;
       } catch (error) {
+        updateDebugOutput({
+          configured: true,
+          calendarId,
+          selectedDate,
+          error: error.message || "載入事件失敗"
+        });
         renderError(error.message || "載入事件失敗。");
         calendarStatusEl.textContent = "無法載入 Google Calendar 事件。";
       }
@@ -441,6 +747,15 @@
 
     refreshButton.addEventListener("click", loadEvents);
 
+    todayButton.addEventListener("click", () => {
+      dateInput.value = getTodayInputValue();
+      loadEvents();
+    });
+
+    dateInput.addEventListener("change", loadEvents);
+
+    dateInput.value = getTodayInputValue();
+    updateHeaderDate();
     updateClock();
     loadEvents();
     setInterval(updateClock, 1000);

@@ -211,6 +211,11 @@
       background: rgba(255, 255, 255, 0.92);
     }
 
+    .event-card.is-muted {
+      background: rgba(126, 136, 145, 0.18);
+      border-color: rgba(88, 98, 108, 0.22);
+    }
+
     .event-time {
       font-size: clamp(1rem, 1.12vw, 1.2rem);
       color: var(--accent);
@@ -218,6 +223,13 @@
       letter-spacing: 0.05em;
       text-transform: uppercase;
       font-variant-numeric: tabular-nums;
+    }
+
+    .event-card.is-muted .event-time,
+    .event-card.is-muted .event-title,
+    .event-card.is-muted .event-note,
+    .event-card.is-muted .event-location {
+      color: #5b6670;
     }
 
     .event-main {
@@ -237,13 +249,40 @@
       font-size: clamp(0.95rem, 1vw, 1.1rem);
     }
 
+    .event-flags {
+      display: flex;
+      gap: 0.45vw;
+      flex-wrap: wrap;
+      margin-top: 0.7vh;
+    }
+
+    .event-flag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.35vh 0.55vw;
+      border-radius: 999px;
+      font-size: clamp(0.82rem, 0.86vw, 0.92rem);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      background: rgba(18, 32, 43, 0.08);
+      color: var(--text);
+    }
+
+    .event-flag.is-cancelled,
+    .event-flag.is-rescheduled {
+      background: rgba(91, 102, 112, 0.18);
+      color: #4d5862;
+    }
+
     .event-location {
       justify-self: end;
-      padding: 0.8vh 0.9vw;
-      border-radius: 999px;
+      padding: 0.9vh 1vw;
+      border-radius: 1vw;
       background: var(--accent-soft);
       color: var(--text);
-      font-size: clamp(0.92rem, 0.98vw, 1.05rem);
+      font-size: clamp(1.15rem, 1.45vw, 1.75rem);
+      font-weight: 600;
+      line-height: 1.2;
       text-align: center;
       max-width: 100%;
       word-break: break-word;
@@ -423,6 +462,9 @@
             <button type="submit">更新日曆來源</button>
             <p class="tiny">
               此頁面使用 Google Calendar JSON API。私人事件通常只會回傳時間，不會回傳標題與地點。
+            </p>
+            <p class="tiny">
+              狀態標記建議：取消可直接在 Google Calendar 取消事件，或在標題/描述加入 `#已取消`；改期可在標題或描述加入 `#已改期`。
             </p>
           </form>
 
@@ -614,6 +656,38 @@
       return event.description || "";
     }
 
+    function getStatusSourceText(event) {
+      return `${event.summary || ""}\n${event.description || ""}`.toLowerCase();
+    }
+
+    function getEventState(event) {
+      const sourceText = getStatusSourceText(event);
+
+      if (
+        event.status === "cancelled" ||
+        sourceText.includes("#已取消") ||
+        sourceText.includes("[已取消]") ||
+        sourceText.includes("已取消") ||
+        sourceText.includes("#cancelled") ||
+        sourceText.includes("[cancelled]")
+      ) {
+        return "cancelled";
+      }
+
+      if (
+        sourceText.includes("#已改期") ||
+        sourceText.includes("[已改期]") ||
+        sourceText.includes("已改期") ||
+        sourceText.includes("#rescheduled") ||
+        sourceText.includes("[rescheduled]") ||
+        sourceText.includes("rescheduled")
+      ) {
+        return "rescheduled";
+      }
+
+      return "normal";
+    }
+
     function updateDebugOutput(payload) {
       debugOutputEl.textContent = JSON.stringify(payload, null, 2);
     }
@@ -631,6 +705,11 @@
       events.forEach((event) => {
         const card = document.createElement("article");
         card.className = "event-card";
+        const eventState = getEventState(event);
+
+        if (eventState !== "normal") {
+          card.classList.add("is-muted");
+        }
 
         const time = document.createElement("div");
         time.className = "event-time";
@@ -647,9 +726,29 @@
         note.className = "event-note";
         note.textContent = getEventNote(event);
 
+        const flags = document.createElement("div");
+        flags.className = "event-flags";
+
+        if (eventState === "cancelled") {
+          const cancelledFlag = document.createElement("span");
+          cancelledFlag.className = "event-flag is-cancelled";
+          cancelledFlag.textContent = "已取消";
+          flags.appendChild(cancelledFlag);
+        }
+
+        if (eventState === "rescheduled") {
+          const rescheduledFlag = document.createElement("span");
+          rescheduledFlag.className = "event-flag is-rescheduled";
+          rescheduledFlag.textContent = "已改期";
+          flags.appendChild(rescheduledFlag);
+        }
+
         main.appendChild(title);
         if (note.textContent) {
           main.appendChild(note);
+        }
+        if (flags.childElementCount) {
+          main.appendChild(flags);
         }
 
         const location = document.createElement("div");
@@ -721,6 +820,7 @@
             start: event.start,
             end: event.end,
             visibility: event.visibility,
+            derivedState: getEventState(event),
             htmlLink: event.htmlLink
           }))
         });

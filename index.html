@@ -534,6 +534,8 @@
       calendarId: "083ec7d7bd60163ad48c541f1489d74d794f914782549f378b55780c19d28719@group.calendar.google.com"
     };
 
+    const appTimeZone = "Asia/Hong_Kong";
+
     const storageKeys = {
       apiKey: "sttit-google-api-key",
       calendarId: "sttit-google-calendar-id"
@@ -554,10 +556,63 @@
     const calendarIdInput = document.getElementById("calendar-id");
     const debugOutputEl = document.getElementById("debug-output");
 
+    function normalizeApiKey(value) {
+      return (value || "").trim().replace(/^["']|["']$/g, "");
+    }
+
+    function safelyDecode(value) {
+      let decoded = value;
+
+      for (let index = 0; index < 3; index += 1) {
+        try {
+          const next = decodeURIComponent(decoded);
+          if (next === decoded) {
+            break;
+          }
+          decoded = next;
+        } catch (error) {
+          break;
+        }
+      }
+
+      return decoded;
+    }
+
+    function normalizeCalendarId(value) {
+      let calendarId = (value || "").trim().replace(/^["']|["']$/g, "");
+
+      if (!calendarId) {
+        return "";
+      }
+
+      try {
+        const url = new URL(calendarId);
+        const src = url.searchParams.get("src") || url.searchParams.get("cid");
+
+        if (src) {
+          calendarId = src;
+        } else {
+          const icalMatch = url.pathname.match(/\/calendar\/ical\/([^/]+)\//);
+          if (icalMatch) {
+            calendarId = icalMatch[1];
+          }
+        }
+      } catch (error) {
+        const queryStart = calendarId.indexOf("?");
+        if (queryStart >= 0) {
+          const query = calendarId.slice(queryStart + 1);
+          const params = new URLSearchParams(query);
+          calendarId = params.get("src") || params.get("cid") || calendarId;
+        }
+      }
+
+      return safelyDecode(calendarId).trim();
+    }
+
     function getConfig() {
       return {
-        apiKey: localStorage.getItem(storageKeys.apiKey) || defaultConfig.apiKey,
-        calendarId: localStorage.getItem(storageKeys.calendarId) || defaultConfig.calendarId
+        apiKey: normalizeApiKey(localStorage.getItem(storageKeys.apiKey) || defaultConfig.apiKey),
+        calendarId: normalizeCalendarId(localStorage.getItem(storageKeys.calendarId) || defaultConfig.calendarId)
       };
     }
 
@@ -841,6 +896,16 @@
       scheduleContentEl.textContent = message;
     }
 
+    function getGoogleApiErrorMessage(response, data) {
+      const apiMessage = data && data.error && data.error.message;
+
+      if (apiMessage) {
+        return `Google Calendar API 回應狀態 ${response.status}: ${apiMessage}`;
+      }
+
+      return `Google Calendar API 回應狀態 ${response.status}`;
+    }
+
     async function loadEvents() {
       const selectedDate = getSelectedDateValue();
       const { apiKey, calendarId } = getConfig();
@@ -870,14 +935,16 @@
       url.searchParams.set("orderBy", "startTime");
       url.searchParams.set("timeMin", timeMin);
       url.searchParams.set("timeMax", timeMax);
+      url.searchParams.set("timeZone", appTimeZone);
 
       try {
         const response = await fetch(url);
+        const data = await response.json().catch(() => ({}));
+
         if (!response.ok) {
-          throw new Error(`Google Calendar API 回應狀態 ${response.status}`);
+          throw new Error(getGoogleApiErrorMessage(response, data));
         }
 
-        const data = await response.json();
         updateDebugOutput({
           configured: true,
           calendarId,
@@ -912,8 +979,8 @@
 
     configForm.addEventListener("submit", (event) => {
       event.preventDefault();
-      localStorage.setItem(storageKeys.apiKey, apiKeyInput.value.trim());
-      localStorage.setItem(storageKeys.calendarId, calendarIdInput.value.trim());
+      localStorage.setItem(storageKeys.apiKey, normalizeApiKey(apiKeyInput.value));
+      localStorage.setItem(storageKeys.calendarId, normalizeCalendarId(calendarIdInput.value));
       loadEvents();
     });
 
